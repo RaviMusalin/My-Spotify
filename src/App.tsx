@@ -3,6 +3,10 @@ import './App.css'
 import SearchBar from './components/SearchBar';
 
 export default function App() {
+  function handleSearch(term: string) {
+    console.log("Searching for:", term);
+  }
+
   return (
     <div className='min-h-screen bg-neutral-900 text-white'>
       {/* Header*/}
@@ -13,14 +17,14 @@ export default function App() {
 
       {/* Login Button */}
       <button className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400">
-          Login to Spotify
+        Login to Spotify
       </button>
 
       {/* Main Content */}
-     <main className="grid grid-cols-3 gap-6 p-6">
+      <main className="grid grid-cols-3 gap-6 p-6">
         {/* Search */}
         <section className="col-span-2 bg-neutral-800 rounded p-4">
-          <SearchBar/>
+          <SearchBar onSearch={handleSearch}/>
         </section>
 
         {/* Playlist */}
@@ -33,7 +37,7 @@ export default function App() {
       </main>
     </div>
 
-    
+
   );
 }
 
