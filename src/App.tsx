@@ -2,10 +2,38 @@
 import './App.css'
 import SearchBar from './components/SearchBar';
 
+import { useState } from 'react'
+
+type Track =  {
+  id: string;
+  name: string;
+  artist: string;
+  album: string;
+}
+
 export default function App() {
+  const [searchResults, setSearchResults] = useState<Track[]>([])
+
   function handleSearch(term: string) {
-    console.log("Searching for:", term);
-  }
+  const fakeResults: Track[] = [
+    {
+      id: "1",
+      name: `Song matching "${term}"`,
+      artist: "Demo Artist",
+      album: "Demo Album",
+    },
+    {
+      id: "2",
+      name: "Another Demo Song",
+      artist: "Demo Artist 2",
+      album: "Demo Album 2",
+    },
+  ];
+
+  setSearchResults(fakeResults);
+  console.log(searchResults)
+}
+
 
   return (
     <div className='min-h-screen bg-neutral-900 text-white'>
