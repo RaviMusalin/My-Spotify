@@ -1,5 +1,6 @@
 // import { useState } from 'react'
 import './App.css'
+import SearchBar from './components/SearchBar';
 
 export default function App() {
   return (
@@ -19,10 +20,7 @@ export default function App() {
      <main className="grid grid-cols-3 gap-6 p-6">
         {/* Search */}
         <section className="col-span-2 bg-neutral-800 rounded p-4">
-          <h2 className="text-lg font-semibold mb-2">Search</h2>
-          <p className="text-neutral-400">
-            Search UI goes here
-          </p>
+          <SearchBar/>
         </section>
 
         {/* Playlist */}
