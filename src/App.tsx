@@ -1,6 +1,7 @@
 // import { useState } from 'react'
 import './App.css'
 import SearchBar from './components/SearchBar';
+import SearchResults from './components/SearchResults';
 
 import { useState } from 'react'
 
@@ -13,6 +14,7 @@ type Track =  {
 
 export default function App() {
   const [searchResults, setSearchResults] = useState<Track[]>([])
+  
 
   function handleSearch(term: string) {
   const fakeResults: Track[] = [
@@ -34,6 +36,10 @@ export default function App() {
   console.log(searchResults)
 }
 
+function handleAdd(track: Track) {
+  console.log("Adding Track:", track)
+}
+
 
   return (
     <div className='min-h-screen bg-neutral-900 text-white'>
@@ -51,17 +57,10 @@ export default function App() {
       {/* Main Content */}
       <main className="grid grid-cols-3 gap-6 p-6">
         {/* Search */}
-        <section className="col-span-2 bg-neutral-800 rounded p-4">
           <SearchBar onSearch={handleSearch}/>
-        </section>
 
         {/* Playlist */}
-        <section className="bg-neutral-800 rounded p-4">
-          <h2 className="text-lg font-semibold mb-2">Playlist</h2>
-          <p className="text-neutral-400">
-            Playlist UI goes here
-          </p>
-        </section>
+        <SearchResults results={searchResults} onAdd={handleAdd} />
       </main>
     </div>
 
