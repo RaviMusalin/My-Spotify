@@ -3,15 +3,8 @@ import './App.css'
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import Playlist from "./components/Playlist";
+import type { Track } from "./types/Track"
 
-
-
-type Track = {
-  id: string;
-  name: string;
-  artist: string;
-  album: string;
-}
 
 export default function App() {
   const [searchResults, setSearchResults] = useState<Track[]>([]) // Search Results

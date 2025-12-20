@@ -1,9 +1,4 @@
-type Track = {
-    id: string;
-    name: string;
-    artist: string;
-    album: string;
-}
+import type { Track } from "../types/Track"
 
 type SearchResultsProps = {
     results: Track[];
