@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
@@ -11,6 +11,17 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<Track[]>([]) // Search Results
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get("code")
+
+    if (code) {
+      console.log("Spotify auth code", code)
+
+      window.history.replaceState({}, document.title, "/")
+    }
+  }, [])
 
 
   // Handle function for Search Bar component
@@ -52,10 +63,10 @@ export default function App() {
 
   // Handle function for login
   function handleSpotifyLogin() {
-    console.log("LOGGED IN")
-    const clientId = "YOUR_SPOTIFY_CLIENT_ID";
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 
     const scopes = SPOTIFY_SCOPES.join(" ");
+    console.log(import.meta.env.VITE_SPOTIFY_CLIENT_ID);
 
     const authUrl =
       `${SPOTIFY_AUTH_ENDPOINT}` +
@@ -66,6 +77,7 @@ export default function App() {
 
     window.location.href = authUrl;
   }
+
 
 
 
