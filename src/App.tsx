@@ -38,6 +38,7 @@ export default function App() {
 }
 
 function handleAdd(track: Track) {
+  // Check for duplicates
   const alreadyInPlaylist = playlistTracks.some((savedTrack) => savedTrack.id === track.id)
 
   if (alreadyInPlaylist) return;
