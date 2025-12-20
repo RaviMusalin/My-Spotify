@@ -5,4 +5,4 @@ export const SPOTIFY_SCOPES = [
   "playlist-modify-private",
 ];
 
-export const REDIRECT_URI = "http://localhost:5173/";
+export const REDIRECT_URI = "https://ravimyspotify.netlify.app/";
