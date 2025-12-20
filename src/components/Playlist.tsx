@@ -23,7 +23,7 @@ export default function Playlist({ tracks, name, onNameChange, onRemove }: Playl
                 onChange={(e) => onNameChange(e.target.value)}
                 className="w-full mb-3 px-2 py-1 rounded bg-neutral-700 text-white outline-none"
                 placeholder="Enter Playlist Name Here"
-            > </input>
+            />
 
 
             {tracks.length === 0 && (
@@ -32,7 +32,7 @@ export default function Playlist({ tracks, name, onNameChange, onRemove }: Playl
                 </p>)}
 
             {tracks.map((track) => (
-                <div key={track.id} className="flex items-center justify-between py-2 border-b border-neutral 700">
+                <div key={track.id} className="flex items-center justify-between py-2 border-b border-neutral-700">
 
                     <div>
                         <p className="font-medium">{track.name}</p>
