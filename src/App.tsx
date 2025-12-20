@@ -12,16 +12,15 @@ export default function App() {
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const code = params.get("code")
+ useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
 
-    if (code) {
-      console.log("Spotify auth code", code)
+  if (code) {
+    window.history.replaceState({}, document.title, "/");
+  }
+}, []);
 
-      window.history.replaceState({}, document.title, "/")
-    }
-  }, [])
 
 
   // Handle function for Search Bar component
@@ -84,7 +83,7 @@ export default function App() {
   return (
     <div className='min-h-screen bg-neutral-900 text-white'>
       <header className='flex items-center justify-between px-6 border-b border-neutral-800'>
-        <h1 className='text-xl font-bold'>Final Spotify</h1>
+        <h1 className='text-xl font-bold'>Final Spotify TEST</h1>
       </header>
 
 
