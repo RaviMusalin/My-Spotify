@@ -13,7 +13,8 @@ type Track =  {
 }
 
 export default function App() {
-  const [searchResults, setSearchResults] = useState<Track[]>([])
+  const [searchResults, setSearchResults] = useState<Track[]>([]) // Search Results
+  const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   
 
   function handleSearch(term: string) {
@@ -37,7 +38,11 @@ export default function App() {
 }
 
 function handleAdd(track: Track) {
-  console.log("Adding Track:", track)
+  const alreadyInPlaylist = playlistTracks.some((savedTrack) => savedTrack.id === track.id)
+
+  if (alreadyInPlaylist) return;
+
+  setPlaylistTracks((prev) => [...prev, track])
 }
 
 
