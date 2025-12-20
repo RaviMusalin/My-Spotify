@@ -4,6 +4,7 @@ import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import Playlist from "./components/Playlist";
 import type { Track } from "./types/Track"
+import { SPOTIFY_AUTH_ENDPOINT, SPOTIFY_SCOPES, REDIRECT_URI, } from "./config/spotify";
 
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
   const [playlistName, setPlaylistName] = useState<string>("")
 
 
+  // Handle function for Search Bar component
   function handleSearch(term: string) {
     const fakeResults: Track[] = [
       {
@@ -32,6 +34,8 @@ export default function App() {
     console.log(searchResults)
   }
 
+
+  // Handle function for Search Results component
   function handleAdd(track: Track) {
     // Check for duplicates
     const alreadyInPlaylist = playlistTracks.some((savedTrack) => savedTrack.id === track.id)
@@ -41,9 +45,28 @@ export default function App() {
     setPlaylistTracks((prev) => [...prev, track])
   }
 
+  // Handle function for Playlist component
   function handleRemove(track: Track) {
     setPlaylistTracks((prev) => prev.filter((t) => t.id !== track.id))
   }
+
+  // Handle function for login
+  function handleSpotifyLogin() {
+    console.log("LOGGED IN")
+    const clientId = "YOUR_SPOTIFY_CLIENT_ID";
+
+    const scopes = SPOTIFY_SCOPES.join(" ");
+
+    const authUrl =
+      `${SPOTIFY_AUTH_ENDPOINT}` +
+      `?client_id=${clientId}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&scope=${encodeURIComponent(scopes)}`;
+
+    window.location.href = authUrl;
+  }
+
 
 
   return (
@@ -53,7 +76,9 @@ export default function App() {
       </header>
 
 
-      <button className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400">
+      <button
+        className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400"
+        onClick={handleSpotifyLogin}>
         Login to Spotify
       </button>
 
@@ -69,7 +94,7 @@ export default function App() {
             onRemove={handleRemove}
             name={playlistName}
             onNameChange={setPlaylistName}
-  
+
           />
         </section>
 
