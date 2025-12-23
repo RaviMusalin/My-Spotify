@@ -11,15 +11,42 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<Track[]>([]) // Search Results
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
+  const [accessToken, setAccessToken] = useState<string | null>(null)
 
- useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
+  useEffect(() => {
+    if (accessToken) {
+      console.log("ACCESS TOKEN:", accessToken);
+    }
+  }, [accessToken]);
 
-  if (code) {
-    window.history.replaceState({}, document.title, "/");
-  }
-}, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      const BACKEND_URL = import.meta.env.DEV
+        ? "http://localhost:5000"
+        : "https://YOUR_BACKEND_URL_HERE";
+
+      fetch(`${BACKEND_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setAccessToken(data.access_token);
+        })
+        .catch((err) => {
+          console.error("Failed to exchange token", err);
+        });
+
+      window.history.replaceState({}, document.title, "/");
+    }
+  }, []);
+
 
 
 
