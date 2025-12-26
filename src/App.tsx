@@ -14,12 +14,6 @@ export default function App() {
   const [accessToken, setAccessToken] = useState<string | null>(null)
 
   useEffect(() => {
-    if (accessToken) {
-      console.log("ACCESS TOKEN:", accessToken);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
@@ -106,6 +100,7 @@ export default function App() {
   }
 
 
+  const isLoggedIn = Boolean(accessToken);
 
 
   return (
@@ -116,10 +111,13 @@ export default function App() {
 
 
       <button
-        className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400"
-        onClick={handleSpotifyLogin}>
-        Login to Spotify
+        className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400 disabled:opacity-50"
+        onClick={handleSpotifyLogin}
+        disabled={isLoggedIn}
+      >
+        {isLoggedIn ? "Welcome" : "Login to Spotify"}
       </button>
+
 
       <main className="grid grid-cols-3 gap-6 p-6">
         {/* Search */}
