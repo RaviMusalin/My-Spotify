@@ -12,7 +12,7 @@ export default function App() {
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
-  
+
   useEffect(() => {
     if (accessToken) {
       console.log("ACCESS TOKEN:", accessToken);
@@ -26,7 +26,8 @@ export default function App() {
     if (code) {
       const BACKEND_URL = import.meta.env.DEV
         ? "http://localhost:5000"
-        : "https://YOUR_BACKEND_URL_HERE";
+        : "https://my-spotify-backend-tj28.onrender.com";
+
 
       fetch(`${BACKEND_URL}/login`, {
         method: "POST",
