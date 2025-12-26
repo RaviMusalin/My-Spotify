@@ -12,7 +12,7 @@ export default function App() {
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
-
+  
   useEffect(() => {
     if (accessToken) {
       console.log("ACCESS TOKEN:", accessToken);
