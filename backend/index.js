@@ -43,3 +43,41 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+
+// Search route for backend 16.2
+app.get("/search", async (req, res) => {
+  const { q, token } = req.query;
+
+  if (!q || !token) {
+    return res.status(400).json({ error: "Missing query or token" });
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        q
+      )}&type=track&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    // Map Spotify data → our Track shape
+    const tracks = data.tracks.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      artist: item.artists[0].name,
+      album: item.album.name,
+    }));
+
+    res.json(tracks);
+  } catch (err) {
+    res.status(500).json({ error: "Spotify search failed" });
+  }
+});
+
