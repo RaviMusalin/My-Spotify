@@ -47,26 +47,27 @@ export default function App() {
 
   // Handle function for Search Bar component
   function handleSearch(term: string) {
-  console.log("Searching for:", term);
-  console.log("Has access token?", Boolean(accessToken));
-
-  if (!accessToken) {
-    setSearchResults([]); // show "No Results Yet"
-    return;
-  }
 
   const BACKEND_URL = import.meta.env.DEV
     ? "http://localhost:5000"
     : "https://my-spotify-backend-tj28.onrender.com";
 
+  const headers: HeadersInit = {};
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(term)}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    headers,
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Search request failed");
+      }
+      return res.json();
+    })
     .then((tracks: Track[]) => {
-      console.log("Backend returned tracks:", tracks);
       setSearchResults(tracks);
     })
     .catch((err) => {
@@ -74,6 +75,7 @@ export default function App() {
       setSearchResults([]);
     });
 }
+
 
 
 
