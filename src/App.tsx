@@ -47,24 +47,35 @@ export default function App() {
 
   // Handle function for Search Bar component
   function handleSearch(term: string) {
-    const fakeResults: Track[] = [
-      {
-        id: "1",
-        name: `Song matching "${term}"`,
-        artist: "Demo Artist",
-        album: "Demo Album",
-      },
-      {
-        id: "2",
-        name: "Another Demo Song",
-        artist: "Demo Artist 2",
-        album: "Demo Album 2",
-      },
-    ];
+  console.log("Searching for:", term);
+  console.log("Has access token?", Boolean(accessToken));
 
-    setSearchResults(fakeResults);
-    console.log(searchResults)
+  if (!accessToken) {
+    setSearchResults([]); // show "No Results Yet"
+    return;
   }
+
+  const BACKEND_URL = import.meta.env.DEV
+    ? "http://localhost:5000"
+    : "https://my-spotify-backend-tj28.onrender.com";
+
+  fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(term)}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((tracks: Track[]) => {
+      console.log("Backend returned tracks:", tracks);
+      setSearchResults(tracks);
+    })
+    .catch((err) => {
+      console.error("Search failed", err);
+      setSearchResults([]);
+    });
+}
+
+
 
 
   // Handle function for Search Results component

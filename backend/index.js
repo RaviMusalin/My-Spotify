@@ -45,13 +45,15 @@ app.post("/login", async (req, res) => {
 
 
 
-// Search route for backend 16.2
 app.get("/search", async (req, res) => {
-  const { q, token } = req.query;
+  const q = req.query.q;
+  const authHeader = req.headers.authorization;
 
-  if (!q || !token) {
-    return res.status(400).json({ error: "Missing query or token" });
+  if (!q || !authHeader) {
+    return res.status(400).json({ error: "Missing query or authorization" });
   }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const response = await fetch(
@@ -67,7 +69,6 @@ app.get("/search", async (req, res) => {
 
     const data = await response.json();
 
-    // Map Spotify data → our Track shape
     const tracks = data.tracks.items.map((item) => ({
       id: item.id,
       name: item.name,
