@@ -4,6 +4,13 @@ import fetch from "node-fetch";
 import dotenv from "dotenv";
 
 
+import pool from "./db.js";
+
+pool.query("SELECT NOW()")
+  .then(() => console.log("Connected to PostgreSQL"))
+  .catch((err) => console.error("Postgres connection error", err));
+
+
 let appAccessToken = null;
 let appTokenExpiresAt = 0;
 
