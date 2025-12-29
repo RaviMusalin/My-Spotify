@@ -1,6 +1,7 @@
 export type Track = {
-    id: string;
-    name: string;
-    artist: string; 
-    album: string;
-}
+  id: string;
+  uri: string;
+  name: string;
+  artist: string;
+  album: string;
+};

@@ -48,33 +48,33 @@ export default function App() {
   // Handle function for Search Bar component
   function handleSearch(term: string) {
 
-  const BACKEND_URL = import.meta.env.DEV
-    ? "http://localhost:5000"
-    : "https://my-spotify-backend-tj28.onrender.com";
+    const BACKEND_URL = import.meta.env.DEV
+      ? "http://localhost:5000"
+      : "https://my-spotify-backend-tj28.onrender.com";
 
-  const headers: HeadersInit = {};
+    const headers: HeadersInit = {};
 
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(term)}`, {
+      headers,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Search request failed");
+        }
+        return res.json();
+      })
+      .then((tracks: Track[]) => {
+        setSearchResults(tracks);
+      })
+      .catch((err) => {
+        console.error("Search failed", err);
+        setSearchResults([]);
+      });
   }
-
-  fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(term)}`, {
-    headers,
-  })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Search request failed");
-      }
-      return res.json();
-    })
-    .then((tracks: Track[]) => {
-      setSearchResults(tracks);
-    })
-    .catch((err) => {
-      console.error("Search failed", err);
-      setSearchResults([]);
-    });
-}
 
 
 
@@ -113,6 +113,54 @@ export default function App() {
   }
 
 
+
+
+
+
+  function handleSavePlaylist() {
+    if (!accessToken || playlistTracks.length === 0) return;
+
+    const BACKEND_URL = import.meta.env.DEV
+      ? "http://localhost:5000"
+      : "https://my-spotify-backend-tj28.onrender.com";
+
+
+    // Create playlist
+    fetch(`${BACKEND_URL}/playlists`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: playlistName }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const playlistId = data.playlistId;
+
+        const uris = playlistTracks.map((t) => t.uri);
+
+        // 2️⃣ Add tracks
+        return fetch(`${BACKEND_URL}/playlists/${playlistId}/tracks`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uris }),
+        });
+      })
+      .then(() => {
+        setPlaylistTracks([]);
+        setPlaylistName("");
+        alert("Playlist saved to Spotify!");
+      })
+      .catch(() => {
+        alert("Failed to save playlist");
+      });
+  }
+
+
   const isLoggedIn = Boolean(accessToken);
 
 
@@ -141,11 +189,12 @@ export default function App() {
         <section className="bg-neutral-800 rounded p-4">
           <Playlist
             tracks={playlistTracks}
-            onRemove={handleRemove}
             name={playlistName}
             onNameChange={setPlaylistName}
-
+            onRemove={handleRemove}
+            onSave={handleSavePlaylist}
           />
+
         </section>
 
       </main>

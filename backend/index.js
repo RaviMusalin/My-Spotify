@@ -117,15 +117,118 @@ app.get("/search", async (req, res) => {
 
 
     const tracks = data.tracks.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      artist: item.artists[0].name,
-      album: item.album.name,
-    }));
+  id: item.id,
+  uri: item.uri,
+  name: item.name,
+  artist: item.artists[0].name,
+  album: item.album.name,
+}));
+
 
     res.json(tracks);
   } catch (err) {
     res.status(500).json({ error: "Spotify search failed" });
+  }
+});
+
+app.get("/me", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "Missing authorization" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    res.json({ id: data.id });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch user profile" });
+  }
+});
+
+
+
+
+
+app.post("/playlists", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const { name } = req.body;
+
+  if (!authHeader || !name) {
+    return res.status(400).json({ error: "Missing data" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    // Get user ID
+    const meRes = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const meData = await meRes.json();
+
+    // Create playlist
+    const playlistRes = await fetch(
+      `https://api.spotify.com/v1/users/${meData.id}/playlists`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          public: false,
+        }),
+      }
+    );
+
+    const playlistData = await playlistRes.json();
+
+    res.json({ playlistId: playlistData.id });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create playlist" });
+  }
+});
+
+app.post("/playlists/:id/tracks", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const { uris } = req.body;
+
+  if (!authHeader || !uris) {
+    return res.status(400).json({ error: "Missing data" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    await fetch(
+      `https://api.spotify.com/v1/playlists/${req.params.id}/tracks`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ uris }),
+      }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add tracks" });
   }
 });
 

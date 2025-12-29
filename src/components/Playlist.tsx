@@ -1,14 +1,16 @@
 import type { Track } from "../types/Track"
 
 type PlaylistProps = {
-    tracks: Track[];
-    name: string;
-    onNameChange: (name: string) => void;
-    onRemove: (track: Track) => void;
+  tracks: Track[];
+  name: string;
+  onNameChange: (name: string) => void;
+  onRemove: (track: Track) => void;
+  onSave: () => void; // ✅ add this
 };
 
 
-export default function Playlist({ tracks, name, onNameChange, onRemove }: PlaylistProps) {
+
+export default function Playlist({ tracks, name, onNameChange, onRemove, onSave }: PlaylistProps) {
     return (
         <div>
             <h3 className="text-lg font-semibold mb-2">Playlist</h3>
@@ -45,12 +47,13 @@ export default function Playlist({ tracks, name, onNameChange, onRemove }: Playl
                 </div>
             ))}
 
-            <button
-                disabled
-                className="mt-4 w-full px-3 py-2 rounded bg-neutral-600 text-neutral-400 cursor-not-allowed"
-            >
-                Save to Spotify
-            </button>
+           <button
+  disabled={!tracks.length}
+  onClick={onSave}
+  className="mt-4 w-full px-3 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400 disabled:opacity-50"
+>
+  Save to Spotify
+</button>
 
         </div>
     )
