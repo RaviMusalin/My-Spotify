@@ -7,11 +7,20 @@ import type { Track } from "./types/Track"
 import { SPOTIFY_AUTH_ENDPOINT, SPOTIFY_SCOPES, REDIRECT_URI, } from "./config/spotify";
 
 
+
 export default function App() {
   const [searchResults, setSearchResults] = useState<Track[]>([]) // Search Results
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
+
+  // Restore token on page load (Fix login bug)
+  useEffect(() => {
+    const storedToken = localStorage.getItem("spotify_access_token");
+    if (storedToken) {
+      setAccessToken(storedToken);
+    }
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -33,6 +42,7 @@ export default function App() {
         .then((res) => res.json())
         .then((data) => {
           setAccessToken(data.access_token);
+          localStorage.setItem("spotify_access_token", data.access_token);
         })
         .catch((err) => {
           console.error("Failed to exchange token", err);
@@ -97,24 +107,28 @@ export default function App() {
 
   // Handle function for login
   function handleSpotifyLogin() {
-    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    if (accessToken) {
+      // Logout
+      localStorage.removeItem("spotify_access_token");
+      setAccessToken(null);
+      window.location.href = "/";
+      return;
+    }
 
+    // Login
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
     const scopes = SPOTIFY_SCOPES.join(" ");
-    console.log(import.meta.env.VITE_SPOTIFY_CLIENT_ID);
 
     const authUrl =
       `${SPOTIFY_AUTH_ENDPOINT}` +
       `?client_id=${clientId}` +
       `&response_type=code` +
       `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-      `&scope=${encodeURIComponent(scopes)}`;
+      `&scope=${encodeURIComponent(scopes)}` +
+      `&show_dialog=true`; // REVIEW SHOW DIALOG 
 
     window.location.href = authUrl;
   }
-
-
-
-
 
 
   function handleSavePlaylist() {
@@ -181,7 +195,7 @@ export default function App() {
         onClick={handleSpotifyLogin}
         disabled={isLoggedIn}
       >
-        {isLoggedIn ? "Welcome" : "Login to Spotify"}
+        {isLoggedIn ? "Logout" : "Login to Spotify"}
       </button>
 
 
