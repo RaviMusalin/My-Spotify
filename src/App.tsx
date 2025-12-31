@@ -136,20 +136,25 @@ export default function App() {
     })
       .then((res) => res.json())
       .then((data) => {
-        const playlistId = data.playlistId;
+        const spotifyPlaylistId = data.playlistId;
+        const dbPlaylistId = data.dbPlaylistId;
 
         const uris = playlistTracks.map((t) => t.uri);
 
-        // 2️⃣ Add tracks
-        return fetch(`${BACKEND_URL}/playlists/${playlistId}/tracks`, {
+        return fetch(`${BACKEND_URL}/playlists/${spotifyPlaylistId}/tracks`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ uris }),
+          body: JSON.stringify({
+            uris,
+            tracks: playlistTracks,
+            dbPlaylistId,
+          }),
         });
       })
+
       .then(() => {
         setPlaylistTracks([]);
         setPlaylistName("");

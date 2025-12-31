@@ -2,8 +2,6 @@ import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-
-
 import pool from "./db.js";
 
 pool.query("SELECT NOW()")
@@ -204,6 +202,24 @@ app.post("/playlists", async (req, res) => {
 
     const playlistData = await playlistRes.json();
 
+    const spotifyPlaylistId = playlistData.id;
+
+// Save playlist metadata to PostgreSQL
+const result = await pool.query(
+  `
+  INSERT INTO playlists (spotify_playlist_id, name, created_by)
+  VALUES ($1, $2, $3)
+  RETURNING id
+  `,
+  [spotifyPlaylistId, name, meData.id]
+);
+
+res.json({
+  playlistId: spotifyPlaylistId,
+  dbPlaylistId: result.rows[0].id,
+});
+
+
     res.json({ playlistId: playlistData.id });
   } catch (err) {
     res.status(500).json({ error: "Failed to create playlist" });
@@ -212,15 +228,16 @@ app.post("/playlists", async (req, res) => {
 
 app.post("/playlists/:id/tracks", async (req, res) => {
   const authHeader = req.headers.authorization;
-  const { uris } = req.body;
+  const { uris, tracks, dbPlaylistId } = req.body;
 
-  if (!authHeader || !uris) {
+  if (!authHeader || !uris || !tracks || !dbPlaylistId) {
     return res.status(400).json({ error: "Missing data" });
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
+    // Add tracks to Spotify
     await fetch(
       `https://api.spotify.com/v1/playlists/${req.params.id}/tracks`,
       {
@@ -233,9 +250,30 @@ app.post("/playlists/:id/tracks", async (req, res) => {
       }
     );
 
+    // Save tracks to PostgreSQL
+    for (const track of tracks) {
+      await pool.query(
+        `
+        INSERT INTO playlist_tracks
+        (playlist_id, track_id, track_uri, name, artist, album)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [
+          dbPlaylistId,
+          track.id,
+          track.uri,
+          track.name,
+          track.artist,
+          track.album,
+        ]
+      );
+    }
+
     res.json({ success: true });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to add tracks" });
   }
 });
+
 
