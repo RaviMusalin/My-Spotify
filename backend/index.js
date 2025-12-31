@@ -165,6 +165,8 @@ app.get("/me", async (req, res) => {
 
 
 app.post("/playlists", async (req, res) => {
+  console.log("🔥 /playlists route hit");
+
   const authHeader = req.headers.authorization;
   const { name } = req.body;
 
@@ -205,6 +207,13 @@ app.post("/playlists", async (req, res) => {
     const spotifyPlaylistId = playlistData.id;
 
 // Save playlist metadata to PostgreSQL
+console.log("🔥 Inserting playlist into Postgres", {
+  spotifyPlaylistId,
+  name,
+  createdBy: meData.id,
+});
+
+
 const result = await pool.query(
   `
   INSERT INTO playlists (spotify_playlist_id, name, created_by)
@@ -222,8 +231,9 @@ res.json({
 
     res.json({ playlistId: playlistData.id });
   } catch (err) {
-    res.status(500).json({ error: "Failed to create playlist" });
-  }
+  console.error("❌ Playlist save failed:", err);
+  res.status(500).json({ error: "Failed to save playlist" });
+}
 });
 
 app.post("/playlists/:id/tracks", async (req, res) => {
