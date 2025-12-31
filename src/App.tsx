@@ -193,7 +193,6 @@ export default function App() {
       <button
         className="px-4 py-2 rounded bg-green-500 text-black font-semibold hover:bg-green-400 disabled:opacity-50"
         onClick={handleSpotifyLogin}
-        disabled={isLoggedIn}
       >
         {isLoggedIn ? "Logout" : "Login to Spotify"}
       </button>
