@@ -2,7 +2,17 @@ import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+dotenv.config();
+  
+console.log("ENV CHECK:", {
+  DATABASE_URL: process.env.DATABASE_URL,
+  NODE_ENV: process.env.NODE_ENV,
+});
+
+console.log("DB FILE LOADED");
+
 import pool from "./db.js";
+
 
 pool.query("SELECT NOW()")
   .then(() => console.log("Connected to PostgreSQL"))
@@ -11,8 +21,6 @@ pool.query("SELECT NOW()")
 
 let appAccessToken = null;
 let appTokenExpiresAt = 0;
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -225,33 +233,9 @@ app.post("/playlists", async (req, res) => {
       dbPlaylistId,
     });
   } catch (err) {
-    console.error("❌ Playlist save failed:", err);
+    console.error("Playlist save failed:", err);
     return res.status(500).json({ error: "Failed to save playlist" });
   }
-});
-
-
-
-const result = await pool.query(
-  `
-  INSERT INTO playlists (spotify_playlist_id, name, created_by)
-  VALUES ($1, $2, $3)
-  RETURNING id
-  `,
-  [spotifyPlaylistId, name, meData.id]
-);
-
-res.json({
-  playlistId: spotifyPlaylistId,
-  dbPlaylistId: result.rows[0].id,
-});
-
-
-    res.json({ playlistId: playlistData.id });
-  } catch (err) {
-  console.error("❌ Playlist save failed:", err);
-  res.status(500).json({ error: "Failed to save playlist" });
-}
 });
 
 app.post("/playlists/:id/tracks", async (req, res) => {
