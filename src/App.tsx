@@ -3,6 +3,7 @@ import './App.css'
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import Playlist from "./components/Playlist";
+import CommunityPlaylists from "./pages/CommunityPlaylists";
 import type { Track } from "./types/Track"
 import { SPOTIFY_AUTH_ENDPOINT, SPOTIFY_SCOPES, REDIRECT_URI, } from "./config/spotify";
 
@@ -13,6 +14,8 @@ export default function App() {
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]) // Tracks in Playlist
   const [playlistName, setPlaylistName] = useState<string>("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [view, setView] = useState<"app" | "community">("app");
+
 
   // Restore token on page load (Fix login bug)
   useEffect(() => {
@@ -197,25 +200,42 @@ export default function App() {
         {isLoggedIn ? "Logout" : "Login to Spotify"}
       </button>
 
+      <div className="flex gap-4 p-4">
+        <button
+          onClick={() => setView("app")}
+          className="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600"
+        >
+          My Playlist
+        </button>
 
-      <main className="grid grid-cols-3 gap-6 p-6">
-        {/* Search */}
-        <SearchBar onSearch={handleSearch} />
+        <button
+          onClick={() => setView("community")}
+          className="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600"
+        >
+          Community
+        </button>
+      </div>
 
-        <SearchResults results={searchResults} onAdd={handleAdd} />
 
-        <section className="bg-neutral-800 rounded p-4">
-          <Playlist
-            tracks={playlistTracks}
-            name={playlistName}
-            onNameChange={setPlaylistName}
-            onRemove={handleRemove}
-            onSave={handleSavePlaylist}
-          />
 
-        </section>
+      {view === "community" ? (
+        <CommunityPlaylists />
+      ) : (
+        <main className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+          <SearchBar onSearch={handleSearch} />
+          <SearchResults results={searchResults} onAdd={handleAdd} />
+          <section className="bg-neutral-800 rounded p-4">
+            <Playlist
+              tracks={playlistTracks}
+              name={playlistName}
+              onNameChange={setPlaylistName}
+              onRemove={handleRemove}
+              onSave={handleSavePlaylist}
+            />
+          </section>
+        </main>
+      )}
 
-      </main>
     </div>
 
 
