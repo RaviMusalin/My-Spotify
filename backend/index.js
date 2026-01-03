@@ -165,8 +165,6 @@ app.get("/me", async (req, res) => {
 
 
 app.post("/playlists", async (req, res) => {
-  console.log("🔥 /playlists route hit");
-
   const authHeader = req.headers.authorization;
   const { name } = req.body;
 
@@ -186,7 +184,7 @@ app.post("/playlists", async (req, res) => {
 
     const meData = await meRes.json();
 
-    // Create playlist
+    // Create playlist on Spotify
     const playlistRes = await fetch(
       `https://api.spotify.com/v1/users/${meData.id}/playlists`,
       {
@@ -203,15 +201,35 @@ app.post("/playlists", async (req, res) => {
     );
 
     const playlistData = await playlistRes.json();
-
     const spotifyPlaylistId = playlistData.id;
 
-// Save playlist metadata to PostgreSQL
-console.log("🔥 Inserting playlist into Postgres", {
-  spotifyPlaylistId,
-  name,
-  createdBy: meData.id,
+    // Save playlist metadata to PostgreSQL
+    console.log("Inserting playlist into Postgres", {
+      spotifyPlaylistId,
+      name,
+      createdBy: meData.id,
+    });
+
+    const dbResult = await pool.query(
+      `INSERT INTO playlists (spotify_playlist_id, name, created_by)
+       VALUES ($1, $2, $3)
+       RETURNING id`,
+      [spotifyPlaylistId, name, meData.id]
+    );
+
+    const dbPlaylistId = dbResult.rows[0].id;
+
+    //SEND RESPONSE ONCE — AND EXIT
+    return res.json({
+      playlistId: spotifyPlaylistId,
+      dbPlaylistId,
+    });
+  } catch (err) {
+    console.error("❌ Playlist save failed:", err);
+    return res.status(500).json({ error: "Failed to save playlist" });
+  }
 });
+
 
 
 const result = await pool.query(

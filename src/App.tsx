@@ -4,6 +4,7 @@ import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import Playlist from "./components/Playlist";
 import CommunityPlaylists from "./pages/CommunityPlaylists";
+import CommunityPlaylistDetails from './pages/CommunityPlaylistDetails';
 import type { Track } from "./types/Track"
 import { SPOTIFY_AUTH_ENDPOINT, SPOTIFY_SCOPES, REDIRECT_URI, } from "./config/spotify";
 
@@ -15,6 +16,7 @@ export default function App() {
   const [playlistName, setPlaylistName] = useState<string>("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [view, setView] = useState<"app" | "community">("app");
+  const [selectedCommunityPlaylistId, setSelectedCommunityPlaylistId] = useState<number | null>(null);
 
 
   // Restore token on page load (Fix login bug)
@@ -219,7 +221,16 @@ export default function App() {
 
 
       {view === "community" ? (
-        <CommunityPlaylists />
+        selectedCommunityPlaylistId ? (
+          <CommunityPlaylistDetails
+            playlistId={selectedCommunityPlaylistId}
+            onBack={() => setSelectedCommunityPlaylistId(null)}
+          />
+        ) : (
+          <CommunityPlaylists
+            onSelect={(id) => setSelectedCommunityPlaylistId(id)}
+          />
+        )
       ) : (
         <main className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
           <SearchBar onSearch={handleSearch} />
@@ -235,6 +246,7 @@ export default function App() {
           </section>
         </main>
       )}
+
 
     </div>
 
