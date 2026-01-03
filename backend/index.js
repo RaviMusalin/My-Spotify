@@ -287,3 +287,42 @@ app.post("/playlists/:id/tracks", async (req, res) => {
 });
 
 
+// Community Playlist Route
+app.get("/community-playlists", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, name, created_by, created_at
+      FROM playlists
+      ORDER BY created_at DESC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Failed to fetch playlists", err);
+    res.status(500).json({ error: "Failed to fetch playlists" });
+  }
+});
+
+app.get("/community-playlists/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const playlist = await pool.query(
+      `SELECT id, name, created_by FROM playlists WHERE id = $1`,
+      [id]
+    );
+
+    const tracks = await pool.query(
+      `SELECT name, artist, album, uri FROM tracks WHERE playlist_id = $1`,
+      [id]
+    );
+
+    res.json({
+      playlist: playlist.rows[0],
+      tracks: tracks.rows,
+    });
+  } catch (err) {
+    console.error("Failed to fetch playlist", err);
+    res.status(500).json({ error: "Failed to fetch playlist" });
+  }
+});
